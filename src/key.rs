@@ -9,9 +9,14 @@ pub mod key {
     };
 
     use device_query::{DeviceEvents, DeviceEventsHandler, Keycode};
+    use rusqlite::Connection;
+
+    use crate::db::db::insert_keys_to_db;
 
     /// 初始化键盘事件处理器
-    pub fn init_handler() -> (DeviceEventsHandler, Box<dyn Any>, Box<dyn Any>) {
+    pub fn init_handler(
+        conn: Arc<Mutex<Connection>>,
+    ) -> (DeviceEventsHandler, Box<dyn Any>, Box<dyn Any>) {
         let event_handler = DeviceEventsHandler::new(Duration::from_millis(10))
             .expect("Could not initialize event handler.");
 
@@ -29,14 +34,32 @@ pub mod key {
 
         let keys_set_clone_2 = Arc::clone(&keys_set);
         let last_down_flag_clone_2 = Arc::clone(&last_down_flag);
+        let conn_clone = Arc::clone(&conn);
         let release_key_guard = event_handler.on_key_up(move |key| {
-            if let Ok(set) = keys_set_clone_2.lock() {
-                if last_down_flag_clone_2.load(Ordering::SeqCst) {
-                    println!("Currently pressed keys: {:?}", set);
+            let keys_snapshot = {
+                if !last_down_flag_clone_2.load(Ordering::SeqCst) {
+                    None
+                } else if let Ok(set) = keys_set_clone_2.lock() {
+                    if set.is_empty() {
+                        None
+                    } else {
+                        Some(set.clone())
+                    }
+                } else {
+                    None
+                }
+            };
+
+            if let Some(snapshot) = keys_snapshot {
+                println!("Currently pressed keys: {:?}", snapshot);
+                if let Ok(db_conn) = conn_clone.lock() {
+                    insert_keys_to_db(&db_conn, &snapshot);
                 }
             }
+
             record_release_key(&key, &keys_set_clone_2);
             last_down_flag_clone_2.store(false, Ordering::SeqCst);
+
             if let Keycode::Escape = key {
                 exit(0);
             }
@@ -55,7 +78,7 @@ pub mod key {
         }
     }
 
-    /// 有按键被释放时清空集合
+    /// 有按键被释放时将其从集合中移除
     fn record_release_key(key: &Keycode, keys_set: &Arc<Mutex<HashSet<String>>>) {
         if let Ok(mut set) = keys_set.lock() {
             set.remove(&key.to_string());
