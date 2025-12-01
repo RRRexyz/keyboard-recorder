@@ -7,7 +7,7 @@ pub mod key {
         sync::{Arc, Mutex},
     };
 
-    use device_query::{DeviceEvents, DeviceEventsHandler, Keycode};
+    use device_query::{DeviceEvents, DeviceEventsHandler, Keycode, DeviceState, DeviceQuery};
 
     /// 初始化键盘事件处理器
     pub fn init_handler() -> (DeviceEventsHandler, Box<dyn Any>, Box<dyn Any>) {
@@ -20,17 +20,19 @@ pub mod key {
         let keys_set_clone = Arc::clone(&keys_set);
         let press_key_guard = event_handler.on_key_down(move |key| {
             record_press_key(&key, &keys_set_clone);
-            if let Ok(set) = keys_set_clone.lock() {
-                println!("Currently pressed keys: {:?}", set);
-            }
         });
 
+        let device_state = DeviceState::new();
         let keys_set_clone_2 = Arc::clone(&keys_set);
         let release_key_guard = event_handler.on_key_up(move |key| {
-            record_release_key(key, &keys_set_clone_2);
             if let Ok(set) = keys_set_clone_2.lock() {
-                println!("Currently pressed keys: {:?}", set);
+                if !set.is_empty() {
+                    let mut keys = device_state.get_keys();
+                    keys.push(*key);
+                    println!("Currently pressed keys: {:?}", &keys);
+                }
             }
+            record_release_key(&keys_set_clone_2);
             if let Keycode::Escape = key {
                 exit(0);
             }
@@ -49,10 +51,10 @@ pub mod key {
         }
     }
 
-    /// 释放按键时将其从集合中移除
-    fn record_release_key(key: &Keycode, keys_set: &Arc<Mutex<HashSet<String>>>) {
+    /// 有按键被释放时清空集合
+    fn record_release_key(keys_set: &Arc<Mutex<HashSet<String>>>) {
         if let Ok(mut set) = keys_set.lock() {
-            set.remove(&key.to_string());
+            set.clear();
         }
     }
 }
