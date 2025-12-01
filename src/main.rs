@@ -1,4 +1,4 @@
-use keyboard_recorder::{db::db::init_database, key::key::init_handler};
+use keyboard_recorder::{db::init_database, key::init_handler};
 use std::{
     sync::{Arc, Mutex},
     thread,
