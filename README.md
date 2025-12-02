@@ -21,9 +21,9 @@
 
 ### 查询记录
 ```powershell
-./kero.exe query -s 查询所有单键记录
-./kero.exe query -c 查询所有组合键记录
-./kero.exe query 查询所有记录
+./kero.exe query -s     # 查询所有单键记录
+./kero.exe query -c     # 查询所有组合键记录
+./kero.exe query    # 查询所有记录
 ```
 示例效果：
 ```
@@ -54,6 +54,6 @@
 
 ### 清空数据库
 ```powershell
-./kero.exe clear 直接清空数据库
-./kero.exe clear -b 先备份一份backup,再清空数据库
+./kero.exe clear    # 直接清空数据库
+./kero.exe clear -b     # 先备份一份backup,再清空数据库
 ```
