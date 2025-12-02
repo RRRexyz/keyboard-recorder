@@ -25,6 +25,32 @@
 ./kero.exe query -c 查询所有组合键记录
 ./kero.exe query 查询所有记录
 ```
+示例效果：
+```
++---------------------+--------+-------+
+|        Keys         |  Type  | Count |
++---------------------+--------+-------+
+| Backspace           | Single |     4 |
+| E                   | Single |     2 |
+| Enter+RAlt          | Combo  |     2 |
+| Up                  | Single |     2 |
+| C+LControl          | Combo  |     1 |
+| End                 | Single |     1 |
+| Escape              | Single |     1 |
+| G                   | Single |     1 |
+| Grave               | Single |     1 |
+| H                   | Single |     1 |
+| H+I+S               | Combo  |     1 |
+| Key2                | Single |     1 |
+| LAlt+LControl+Space | Combo  |     1 |
+| N                   | Single |     1 |
+| O+P                 | Combo  |     1 |
+| Right               | Single |     1 |
+| T                   | Single |     1 |
+| Z                   | Single |     1 |
++---------------------+--------+-------+
+```
+
 
 ### 清空数据库
 ```powershell
