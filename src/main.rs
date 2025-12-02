@@ -3,7 +3,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-use keyboard_recorder::{
+use kero::{
     clt::{Cli, Command as CliCommand},
     commands::{
         clear::run as clear_command,
