@@ -1,4 +1,3 @@
-use std::process::exit;
 use std::time::Duration;
 use std::{
     any::Any,
@@ -58,10 +57,6 @@ pub fn init_handler(
 
         record_release_key(key, &keys_set_clone_2);
         last_down_flag_clone_2.store(false, Ordering::SeqCst);
-
-        if let Keycode::Escape = key {
-            exit(0);
-        }
     });
     (
         event_handler,
