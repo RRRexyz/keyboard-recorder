@@ -10,7 +10,7 @@ use std::{
 use device_query::{DeviceEvents, DeviceEventsHandler, Keycode};
 use rusqlite::Connection;
 
-use crate::db::insert_keys_to_db;
+use crate::{db::insert_keys_to_db, logging};
 
 /// 初始化键盘事件处理器
 pub fn init_handler(
@@ -50,7 +50,7 @@ pub fn init_handler(
         };
 
         if let Some(snapshot) = keys_snapshot {
-            println!("Currently pressed keys: {:?}", snapshot);
+            logging::info(format!("Currently pressed keys: {:?}", snapshot));
             if let Ok(db_conn) = conn_clone.lock() {
                 insert_keys_to_db(&db_conn, &snapshot);
             }
